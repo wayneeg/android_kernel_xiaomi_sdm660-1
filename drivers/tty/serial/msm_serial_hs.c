@@ -2810,25 +2810,25 @@ struct msm_serial_hs_platform_data
 	pdata->uart_tx_gpio = of_get_named_gpio(node,
 					"qcom,tx-gpio", 0);
 	if (pdata->uart_tx_gpio < 0)
-		pr_err("uart_tx_gpio is not available\n");
+		pr_debug("uart_tx_gpio is not available\n");
 
 	/* UART RX GPIO */
 	pdata->uart_rx_gpio = of_get_named_gpio(node,
 					"qcom,rx-gpio", 0);
 	if (pdata->uart_rx_gpio < 0)
-		pr_err("uart_rx_gpio is not available\n");
+		pr_debug("uart_rx_gpio is not available\n");
 
 	/* UART CTS GPIO */
 	pdata->uart_cts_gpio = of_get_named_gpio(node,
 					"qcom,cts-gpio", 0);
 	if (pdata->uart_cts_gpio < 0)
-		pr_err("uart_cts_gpio is not available\n");
+		pr_debug("uart_cts_gpio is not available\n");
 
 	/* UART RFR GPIO */
 	pdata->uart_rfr_gpio = of_get_named_gpio(node,
 					"qcom,rfr-gpio", 0);
 	if (pdata->uart_rfr_gpio < 0)
-		pr_err("uart_rfr_gpio is not available\n");
+		pr_debug("uart_rfr_gpio is not available\n");
 
 	pdata->no_suspend_delay = of_property_read_bool(node,
 				"qcom,no-suspend-delay");
@@ -3412,6 +3412,7 @@ static int msm_hs_probe(struct platform_device *pdev)
 		return -ENOMEM;
 	}
 
+#ifdef CONFIG_IPC_LOGGING
 	memset(name, 0, sizeof(name));
 	scnprintf(name, sizeof(name), "%s%s", dev_name(msm_uport->uport.dev),
 									"_state");
@@ -3429,6 +3430,7 @@ static int msm_hs_probe(struct platform_device *pdev)
 			MSM_HS_WARN("%s(): Failed create dev. attr\n",
 			 __func__);
 	}
+#endif
 
 	uport->irq = core_irqres;
 	msm_uport->bam_irq = bam_irqres;
@@ -3503,6 +3505,7 @@ static int msm_hs_probe(struct platform_device *pdev)
 	msm_uport->tx.flush = FLUSH_SHUTDOWN;
 	msm_uport->rx.flush = FLUSH_SHUTDOWN;
 
+#ifdef CONFIG_IPC_LOGGING
 	memset(name, 0, sizeof(name));
 	scnprintf(name, sizeof(name), "%s%s", dev_name(msm_uport->uport.dev),
 									"_tx");
@@ -3529,6 +3532,7 @@ static int msm_hs_probe(struct platform_device *pdev)
 	if (!msm_uport->ipc_msm_hs_pwr_ctxt)
 		dev_err(&pdev->dev, "%s(): error creating usr log context\n",
 								__func__);
+#endif
 
 	uport->irq = core_irqres;
 	msm_uport->bam_irq = bam_irqres;
