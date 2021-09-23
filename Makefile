@@ -670,7 +670,18 @@ include/config/auto.conf:
 endif # may-sync-config
 endif # $(dot-config)
 
+
 ifdef CONFIG_CC_IS_CLANG
+ifdef CONFIG_LLVM_POLLY
+OPT_FLAGS := -mllvm -polly \
+		-mllvm -polly-run-dce \
+		-mllvm -polly-run-inliner \
+		-mllvm -polly-opt-fusion=max \
+		-mllvm -polly-ast-use-context \
+		-mllvm -polly-detect-keep-going \
+		-mllvm -polly-vectorizer=stripmine \
+		-mllvm -polly-invariant-load-hoisting
+endif
 OPT_FLAGS := -mcpu=cortex-a53 -mtune=cortex-a53 \
 	     -march=armv8-a+crc+crypto
 else
@@ -903,14 +914,14 @@ endif
 ifdef CONFIG_LTO_CLANG
 ifdef CONFIG_LTO_CLANG_THIN
 CC_FLAGS_LTO	+= -flto=thin -fsplit-lto-unit
-KBUILD_LDFLAGS	+= --thinlto-cache-dir=$(extmod-prefix).thinlto-cache
+KBUILD_LDFLAGS	+= --thinlto-cache-dir=.thinlto-cache
 else
 CC_FLAGS_LTO	+= -flto
 endif
 CC_FLAGS_LTO	+= -fvisibility=hidden
 
 # Limit inlining across translation units to reduce binary size
-KBUILD_LDFLAGS += -mllvm -import-instr-limit=5
+KBUILD_LDFLAGS += --plugin-opt=-import-instr-limit=5
 endif
 
 ifdef CONFIG_LTO
